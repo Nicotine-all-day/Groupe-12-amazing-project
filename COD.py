@@ -1,1 +1,1 @@
-print("je suis trop beau")
+python3 -m pygame.examples.aliens
