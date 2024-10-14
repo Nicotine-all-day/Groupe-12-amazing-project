@@ -1,6 +1,7 @@
 import pygame
 import random
-import sys
+import syspython3.13 --version
+
 
 # Initialize pygame
 pygame.init()
