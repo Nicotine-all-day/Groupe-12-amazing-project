@@ -86,11 +86,11 @@ def game_loop():
                 pygame.quit()
                 sys.exit()
 
-        # Move player
+        # Move player using "J" and "L" keys
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and player_x > 0:
+        if keys[pygame.K_j] and player_x > 0:
             player_x -= player_speed
-        if keys[pygame.K_RIGHT] and player_x < screen_width - player_width:
+        if keys[pygame.K_l] and player_x < screen_width - player_width:
             player_x += player_speed
 
         # Spawn blocks
