@@ -1,0 +1,155 @@
+import pygame
+import random
+import sys
+
+# Initialize pygame
+pygame.init()
+
+# Set up the game window
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Space Dodger")
+
+# Load images
+spaceship_img = pygame.image.load("spaceship.png")
+asteroid_img = pygame.image.load("asteroid.png")
+
+# Scale the images to fit the game
+spaceship_img = pygame.transform.scale(spaceship_img, (60, 60))
+asteroid_img = pygame.transform.scale(asteroid_img, (60, 60))
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Set up the player (spaceship)
+player_width = 60
+player_height = 60
+player_x = screen_width // 2 - player_width // 2
+player_y = screen_height - player_height - 20
+player_speed = 7
+
+# Set up the asteroids (obstacles)
+asteroid_width = 60
+asteroid_height = 60
+asteroid_speed = 5
+asteroid_list = []
+
+# Difficulty increase settings
+difficulty_increase_rate = 0.05  # Speed increase per second
+
+# Font for score
+font = pygame.font.SysFont(None, 35)
+
+# Function to create an asteroid
+def create_asteroid():
+    x = random.randint(0, screen_width - asteroid_width)
+    y = -asteroid_height
+    asteroid_list.append([x, y])
+
+# Function to move asteroids
+def move_asteroids(speed):
+    for asteroid in asteroid_list:
+        asteroid[1] += speed
+
+# Function to draw player
+def draw_player():
+    screen.blit(spaceship_img, (player_x, player_y))
+
+# Function to draw asteroids
+def draw_asteroids():
+    for asteroid in asteroid_list:
+        screen.blit(asteroid_img, (asteroid[0], asteroid[1]))
+
+# Function to check collisions
+def check_collision(player_x, player_y, asteroid_list):
+    for asteroid in asteroid_list:
+        if (asteroid[1] + asteroid_height > player_y and
+            asteroid[1] < player_y + player_height and
+            asteroid[0] + asteroid_width > player_x and
+            asteroid[0] < player_x + player_width):
+            return True
+    return False
+
+# Function to display score
+def display_score(score):
+    score_text = font.render(f"Score: {score}", True, BLACK)
+    screen.blit(score_text, [10, 10])
+
+# Main game loop
+def game_loop():
+    global player_x
+    clock = pygame.time.Clock()
+    score = 0
+    asteroid_spawn_time = 30
+    asteroid_spawn_counter = 0
+    asteroid_speed = 5
+
+    # Timer to increase difficulty over time
+    time_elapsed = 0
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # Move player using "A" and "D" keys
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and player_x > 0:
+            player_x -= player_speed
+        if keys[pygame.K_d] and player_x < screen_width - player_width:
+            player_x += player_speed
+
+        # Spawn asteroids
+        asteroid_spawn_counter += 1
+        if asteroid_spawn_counter >= asteroid_spawn_time:
+            create_asteroid()
+            asteroid_spawn_counter = 0
+
+        # Move asteroids
+        move_asteroids(asteroid_speed)
+
+        # Remove asteroids that are out of screen
+        asteroid_list[:] = [asteroid for asteroid in asteroid_list if asteroid[1] <= screen_height]
+
+        # Draw player and asteroids
+        draw_player()
+        draw_asteroids()
+
+        # Check for collisions
+        if check_collision(player_x, player_y, asteroid_list):
+            running = False  # Game over if there's a collision
+
+        # Update score
+        score += 1
+
+        # Increase asteroid speed as time goes by
+        time_elapsed += clock.get_time() / 1000.0
+        asteroid_speed = 5 + difficulty_increase_rate * time_elapsed
+
+        # Display score
+        display_score(score)
+
+        # Update display
+        pygame.display.flip()
+
+        # Control frame rate
+        clock.tick(60)
+
+    # Game over screen
+    screen.fill(WHITE)
+    game_over_text = font.render(f"Game Over! Your Score: {score}", True, BLACK)
+    screen.blit(game_over_text, [screen_width // 2 - 150, screen_height // 2 - 20])
+    pygame.display.flip()
+    pygame.time.wait(3000)
+
+# Run the game loop
+if __name__ == "__main__":
+    game_loop()
+    pygame.quit()
