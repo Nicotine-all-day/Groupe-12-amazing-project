@@ -1,1 +1,2 @@
-
+#This week guys(and our one girl), we need to think about what we are going to design as a game....and then start writing it here
+#Ideally as Nico Chat said, we should devide tasks between teams of people, and set specific deadlines
