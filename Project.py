@@ -5,14 +5,6 @@ import cv2
 from ffpyplayer.player import MediaPlayer
 from pygame.locals import *
 
-{
-    "cSpell.words": [
-        "pygame", "cv2", "ffpyplayer", "blit", "KEYDOWN", "KEYUP",
-        "colliderect", "centerx", "midtop", "midbottom", "surfarray"
-    ]
-}
-
-
 # Constants for screen dimensions, colors, and game properties
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 600
 FPS = 60
@@ -65,10 +57,12 @@ enemyImages = {
 healthImage = pygame.Surface((20, 20))
 healthImage.fill((0, 255, 0))
 
-# Function to play intro video
+# Function to play intro video with skip button
 def play_intro_video(video_path):
     cap = cv2.VideoCapture(video_path)
     player = MediaPlayer(video_path)
+    skip_button_rect = pygame.Rect(WINDOW_WIDTH - 100, WINDOW_HEIGHT - 50, 80, 30)
+    
     while cap.isOpened():
         ret, frame = cap.read()
         audio_frame, val = player.get_frame()
@@ -78,12 +72,20 @@ def play_intro_video(video_path):
         frame = cv2.transpose(frame)
         frame = pygame.surfarray.make_surface(frame)
         frame = pygame.transform.scale(frame, (WINDOW_WIDTH, WINDOW_HEIGHT))
+        
         windowSurface.blit(frame, (0, 0))
+        pygame.draw.rect(windowSurface, (0, 0, 0), skip_button_rect)
+        draw_text("Skip", WINDOW_WIDTH - 90, WINDOW_HEIGHT - 45, color=(255, 255, 255))
+
         pygame.display.update()
+        
         if cv2.waitKey(20) & 0xFF == ord('q'):
             break
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_ESCAPE:
+                cap.release()
+                return
+            elif event.type == MOUSEBUTTONDOWN and skip_button_rect.collidepoint(event.pos):
                 cap.release()
                 return
             if event.type == QUIT:
@@ -99,8 +101,8 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-def draw_text(text, x, y):
-    text_obj = font.render(text, True, TEXT_COLOR)
+def draw_text(text, x, y, color=TEXT_COLOR):
+    text_obj = font.render(text, True, color)
     windowSurface.blit(text_obj, (x, y))
 
 def wait_for_key_press():
@@ -221,4 +223,18 @@ def main_game():
             windowSurface.blit(current_enemy_image, enemyRect)
 
             for hammer in hammers:
-                windowSurface.blit
+                windowSurface.blit(hammerImage, hammer)
+            for fireball in fireballs:
+                windowSurface.blit(fireballImage, fireball)
+
+            pygame.display.update()
+            mainClock.tick(FPS)
+
+    # Victory screen
+    windowSurface.fill(BACKGROUND_COLOR)
+    draw_text('You Win!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
+    pygame.display.update()
+    wait_for_key_press()
+
+# Start the game
+main_game()
