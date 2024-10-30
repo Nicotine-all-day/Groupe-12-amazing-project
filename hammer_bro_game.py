@@ -1,11 +1,11 @@
 import pygame, random, sys
-from pygame.locals import *
+from pygame.locals import *  # Import necessary constants like K_LEFT, QUIT, etc.
 
 # Constants for game setup
 WINDOWWIDTH = 600
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
-BACKGROUNDCOLOR = (135, 206, 235)  # Sky blue
+BACKGROUNDCOLOR = (135, 206, 235)  # Sky blue background
 FPS = 60
 ENEMY_MINSIZE = 10
 ENEMY_MAXSIZE = 40
