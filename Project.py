@@ -22,12 +22,15 @@ windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('Hammer Bro: Power of Vengeance')
 pygame.mouse.set_visible(False)
 
+# Fix Hammer Image
+hammerImage = pygame.Surface((10, 20))  # Create a 10x20 pixel surface as placeholder
+hammerImage.fill((0, 0, 255))  # Fill it with blue color to simulate a hammer
+
 # Load assets
 font = pygame.font.SysFont(None, 48)
 playerImage = pygame.image.load('hammer_bro.png')  # Placeholder image for Hammer Bro
 playerRect = playerImage.get_rect()
 enemyImage = pygame.image.load('enemy.png')        # Placeholder image for Mario's allies
-hammerImage = pygame.image.load('hammer.png')      # Placeholder image for hammer projectile
 
 # Utility functions
 def terminate():
