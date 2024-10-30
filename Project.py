@@ -1,188 +1,171 @@
-import pygame, random, sys
+import pygame
+import random
+import sys
 from pygame.locals import *  # Import necessary constants like K_LEFT, QUIT, etc.
 
-# Constants for game setup
-WINDOWWIDTH = 600
-WINDOWHEIGHT = 600
-TEXTCOLOR = (0, 0, 0)
-BACKGROUNDCOLOR = (135, 206, 235)  # Sky blue background
+# Constants
+WINDOW_WIDTH = 600
+WINDOW_HEIGHT = 600
+TEXT_COLOR = (0, 0, 0)
+BACKGROUND_COLOR = (135, 206, 235)
 FPS = 60
-ENEMY_MINSIZE = 10
-ENEMY_MAXSIZE = 40
-ENEMY_MINSPEED = 1
-ENEMY_MAXSPEED = 8
-ADDNEWENEMYRATE = 6
-PLAYERMOVERATE = 5
+ENEMY_MIN_SIZE = 10
+ENEMY_MAX_SIZE = 40
+ENEMY_MIN_SPEED = 1
+ENEMY_MAX_SPEED = 8
+ADD_NEW_ENEMY_RATE = 6
+PLAYER_MOVE_RATE = 5
 HAMMER_SPEED = 10
 
 # Initialize pygame
 pygame.init()
 mainClock = pygame.time.Clock()
-windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+windowSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption('Hammer Bro: Power of Vengeance')
 pygame.mouse.set_visible(False)
 
-# Fix Hammer Image
-hammerImage = pygame.Surface((10, 20))  # Create a 10x20 pixel surface as placeholder
-hammerImage.fill((0, 0, 255))  # Fill it with blue color to simulate a hammer
-
-# Load assets
+# Placeholder images
+hammerImage = pygame.Surface((10, 20))
+hammerImage.fill((0, 0, 255))  # Blue to simulate a hammer
 font = pygame.font.SysFont(None, 48)
-playerImage = pygame.image.load('hammer_bro.png')  # Placeholder image for Hammer Bro
+playerImage = pygame.image.load('hammer_bro.png')  # Placeholder for Hammer Bro
 playerRect = playerImage.get_rect()
-enemyImage = pygame.image.load('enemy.png')        # Placeholder image for Mario's allies
+enemyImage = pygame.image.load('enemy.png')        # Placeholder for Mario's allies
 
-# Utility functions
+# Functions
 def terminate():
     pygame.quit()
     sys.exit()
 
 def waitForPlayerToPressKey():
+    """Wait for player to press any key to continue."""
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                terminate()
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    terminate()
                 return
 
 def playerHasHitEnemy(playerRect, enemies):
-    for e in enemies:
-        if playerRect.colliderect(e['rect']):
-            return True
-    return False
+    """Check if player has collided with any enemy."""
+    return any(playerRect.colliderect(e['rect']) for e in enemies)
 
 def drawText(text, font, surface, x, y):
-    textobj = font.render(text, 1, TEXTCOLOR)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
+    """Draw text on the surface."""
+    text_obj = font.render(text, True, TEXT_COLOR)
+    text_rect = text_obj.get_rect(topleft=(x, y))
+    surface.blit(text_obj, text_rect)
 
 # Main game loop
 def main_game():
-    topScore = 0
+    top_score = 0
     while True:
-        # Set up the game start state
-        enemies = []
-        hammers = []
-        score = 0
-        playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
-        moveLeft = moveRight = moveUp = moveDown = False
-        shooting = False
-        enemyAddCounter = 0
+        # Game state initialization
+        enemies, hammers = [], []
+        score, enemy_add_counter = 0, 0
+        playerRect.topleft = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50)
+        move_left = move_right = move_up = move_down = shooting = False
 
-        while True:  # The game loop
-            score += 1  # Increase score
+        while True:  # Main game loop
+            score += 1
             for event in pygame.event.get():
                 if event.type == QUIT:
                     terminate()
+                
+                # Refactored repeated KEYDOWN and KEYUP events
+                if event.type in (KEYDOWN, KEYUP):
+                    key_state = event.type == KEYDOWN
+                    if event.key in (K_LEFT, K_a):
+                        move_left = key_state
+                        move_right = not key_state
+                    elif event.key in (K_RIGHT, K_d):
+                        move_right = key_state
+                        move_left = not key_state
+                    elif event.key in (K_UP, K_w):
+                        move_up = key_state
+                        move_down = not key_state
+                    elif event.key in (K_DOWN, K_s):
+                        move_down = key_state
+                        move_up = not key_state
+                    elif event.key == K_SPACE:
+                        shooting = key_state
 
-                if event.type == KEYDOWN:
-                    if event.key == K_LEFT or event.key == K_a:
-                        moveRight = False
-                        moveLeft = True
-                    if event.key == K_RIGHT or event.key == K_d:
-                        moveLeft = False
-                        moveRight = True
-                    if event.key == K_UP or event.key == K_w:
-                        moveDown = False
-                        moveUp = True
-                    if event.key == K_DOWN or event.key == K_s:
-                        moveUp = False
-                        moveDown = True
-                    if event.key == K_SPACE:
-                        shooting = True
-
-                if event.type == KEYUP:
-                    if event.key == K_LEFT or event.key == K_a:
-                        moveLeft = False
-                    if event.key == K_RIGHT or event.key == K_d:
-                        moveRight = False
-                    if event.key == K_UP or event.key == K_w:
-                        moveUp = False
-                    if event.key == K_DOWN or event.key == K_s:
-                        moveDown = False
-                    if event.key == K_SPACE:
-                        shooting = False
-
-            # Add new enemies
-            enemyAddCounter += 1
-            if enemyAddCounter == ADDNEWENEMYRATE:
-                enemyAddCounter = 0
-                enemySize = random.randint(ENEMY_MINSIZE, ENEMY_MAXSIZE)
-                newEnemy = {
-                    'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - enemySize), 0 - enemySize, enemySize, enemySize),
-                    'speed': random.randint(ENEMY_MINSPEED, ENEMY_MAXSPEED),
-                    'surface': pygame.transform.scale(enemyImage, (enemySize, enemySize)),
+            # Add new enemies at intervals
+            enemy_add_counter += 1
+            if enemy_add_counter == ADD_NEW_ENEMY_RATE:
+                enemy_add_counter = 0
+                enemy_size = random.randint(ENEMY_MIN_SIZE, ENEMY_MAX_SIZE)
+                new_enemy = {
+                    'rect': pygame.Rect(random.randint(0, WINDOW_WIDTH - enemy_size), -enemy_size, enemy_size, enemy_size),
+                    'speed': random.randint(ENEMY_MIN_SPEED, ENEMY_MAX_SPEED),
+                    'surface': pygame.transform.scale(enemyImage, (enemy_size, enemy_size)),
                 }
-                enemies.append(newEnemy)
+                enemies.append(new_enemy)
 
             # Move the player
-            if moveLeft and playerRect.left > 0:
-                playerRect.move_ip(-1 * PLAYERMOVERATE, 0)
-            if moveRight and playerRect.right < WINDOWWIDTH:
-                playerRect.move_ip(PLAYERMOVERATE, 0)
-            if moveUp and playerRect.top > 0:
-                playerRect.move_ip(0, -1 * PLAYERMOVERATE)
-            if moveDown and playerRect.bottom < WINDOWHEIGHT:
-                playerRect.move_ip(0, PLAYERMOVERATE)
+            if move_left and playerRect.left > 0:
+                playerRect.move_ip(-PLAYER_MOVE_RATE, 0)
+            if move_right and playerRect.right < WINDOW_WIDTH:
+                playerRect.move_ip(PLAYER_MOVE_RATE, 0)
+            if move_up and playerRect.top > 0:
+                playerRect.move_ip(0, -PLAYER_MOVE_RATE)
+            if move_down and playerRect.bottom < WINDOW_HEIGHT:
+                playerRect.move_ip(0, PLAYER_MOVE_RATE)
 
-            # Throw hammer if shooting
+            # Shooting mechanic
             if shooting:
-                hammerRect = pygame.Rect(playerRect.centerx, playerRect.top, 10, 20)
-                hammers.append(hammerRect)
+                hammer_rect = pygame.Rect(playerRect.centerx, playerRect.top, 10, 20)
+                hammers.append(hammer_rect)
 
-            # Move the hammers
-            for h in hammers[:]:
-                h.top -= HAMMER_SPEED
-                if h.top < 0:
-                    hammers.remove(h)
+            # Move hammers
+            for hammer in hammers[:]:
+                hammer.top -= HAMMER_SPEED
+                if hammer.top < 0:
+                    hammers.remove(hammer)
 
-            # Move the enemies down
-            for e in enemies:
-                e['rect'].move_ip(0, e['speed'])
-            for e in enemies[:]:
-                if e['rect'].top > WINDOWHEIGHT:
-                    enemies.remove(e)
+            # Move enemies and check for off-screen
+            for enemy in enemies:
+                enemy['rect'].move_ip(0, enemy['speed'])
+            enemies = [enemy for enemy in enemies if enemy['rect'].top <= WINDOW_HEIGHT]
 
-            # Check for hammer collisions with enemies
-            for h in hammers[:]:
-                for e in enemies[:]:
-                    if h.colliderect(e['rect']):
-                        hammers.remove(h)
-                        enemies.remove(e)
-                        score += 10  # Increase score for hitting an enemy
+            # Check for collisions between hammers and enemies
+            for hammer in hammers[:]:
+                for enemy in enemies[:]:
+                    if hammer.colliderect(enemy['rect']):
+                        hammers.remove(hammer)
+                        enemies.remove(enemy)
+                        score += 10
                         break
 
-            # Draw the game world
-            windowSurface.fill(BACKGROUNDCOLOR)
-            drawText('Score: %s' % score, font, windowSurface, 10, 0)
-            drawText('Top Score: %s' % topScore, font, windowSurface, 10, 40)
-
-            # Draw the player and projectiles
+            # Draw game elements
+            windowSurface.fill(BACKGROUND_COLOR)
+            drawText(f'Score: {score}', font, windowSurface, 10, 0)
+            drawText(f'Top Score: {top_score}', font, windowSurface, 10, 40)
             windowSurface.blit(playerImage, playerRect)
-            for h in hammers:
-                windowSurface.blit(hammerImage, h)
 
-            # Draw each enemy
-            for e in enemies:
-                windowSurface.blit(e['surface'], e['rect'])
+            for hammer in hammers:
+                windowSurface.blit(hammerImage, hammer)
+
+            for enemy in enemies:
+                windowSurface.blit(enemy['surface'], enemy['rect'])
 
             pygame.display.update()
 
-            # Check if any enemies have hit the player
+            # Check if player collides with any enemy
             if playerHasHitEnemy(playerRect, enemies):
-                if score > topScore:
-                    topScore = score
+                if score > top_score:
+                    top_score = score  # Update top score
                 break
 
             mainClock.tick(FPS)
 
         # Game over screen
-        drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
-        drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
+        drawText('GAME OVER', font, windowSurface, (WINDOW_WIDTH // 3), (WINDOW_HEIGHT // 3))
+        drawText('Press a key to play again.', font, windowSurface, (WINDOW_WIDTH // 3) - 80, (WINDOW_HEIGHT // 3) + 50)
         pygame.display.update()
         waitForPlayerToPressKey()
 
+# Run the game
 main_game()
