@@ -5,6 +5,14 @@ import cv2
 from ffpyplayer.player import MediaPlayer
 from pygame.locals import *
 
+{
+    "cSpell.words": [
+        "pygame", "cv2", "ffpyplayer", "blit", "KEYDOWN", "KEYUP",
+        "colliderect", "centerx", "midtop", "midbottom", "surfarray"
+    ]
+}
+
+
 # Constants for screen dimensions, colors, and game properties
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 600
 FPS = 60
