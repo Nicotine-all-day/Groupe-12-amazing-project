@@ -11,8 +11,10 @@ FPS = 60
 TEXT_COLOR = (0, 0, 0)
 BACKGROUND_COLOR = (135, 206, 235)
 PLAYER_MOVE_RATE = 5
-HAMMER_SPEED = 15
+HAMMER_SPEED = 7  # Slowed down
+HAMMER_FREQUENCY = 30  # Slowed down
 MAX_HEALTH = 3
+SCALE_FACTOR = 0.25  # Scale images to 25% of their original size
 
 # Level configurations
 LEVELS = [
@@ -29,33 +31,31 @@ pygame.display.set_caption('Hammer Bro: Power of Vengeance')
 
 # Load resources
 font = pygame.font.SysFont(None, 48)
-hammerImage = pygame.Surface((10, 20))
-hammerImage.fill((0, 0, 255))
-fireballImage = pygame.Surface((10, 10))
-fireballImage.fill((255, 0, 0))
+hammerImage = pygame.image.load('hammer.png')
+hammerImage = pygame.transform.scale(hammerImage, (int(hammerImage.get_width() * SCALE_FACTOR), int(hammerImage.get_height() * SCALE_FACTOR)))
+fireballImage = pygame.image.load('fireball.png')  # Load fireball image
+fireballImage = pygame.transform.scale(fireballImage, (20, 20))  # Resize fireball
+
 playerImage = pygame.image.load('hammer_bro.png')
+playerImage = pygame.transform.scale(playerImage, (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR)))
+
 enemyImages = {
     'Princess': {
-        'idle': pygame.image.load('princess_idle.png'),
-        'throw': pygame.image.load('princess_throw.png'),
-        'hit': pygame.image.load('princess_hit.png'),
-        'dead': pygame.image.load('princess_dead.png')
+        'stand': pygame.transform.scale(pygame.image.load('princess_idle.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'throw': pygame.transform.scale(pygame.image.load('princess_throw.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'dead': pygame.transform.scale(pygame.image.load('princess_dead.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR)))
     },
     'Luigi': {
-        'idle': pygame.image.load('luigi_idle.png'),
-        'throw': pygame.image.load('luigi_throw.png'),
-        'hit': pygame.image.load('luigi_hit.png'),
-        'dead': pygame.image.load('luigi_dead.png')
+        'stand': pygame.transform.scale(pygame.image.load('luigi_idle.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'throw': pygame.transform.scale(pygame.image.load('luigi_throw.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'dead': pygame.transform.scale(pygame.image.load('luigi_dead.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR)))
     },
     'Mario': {
-        'idle': pygame.image.load('mario_idle.png'),
-        'throw': pygame.image.load('mario_throw.png'),
-        'hit': pygame.image.load('mario_hit.png'),
-        'dead': pygame.image.load('mario_dead.png')
+        'stand': pygame.transform.scale(pygame.image.load('mario_idle.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'throw': pygame.transform.scale(pygame.image.load('mario_throw.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR))),
+        'dead': pygame.transform.scale(pygame.image.load('mario_dead.png'), (int(playerImage.get_width() * SCALE_FACTOR), int(playerImage.get_height() * SCALE_FACTOR)))
     }
 }
-healthImage = pygame.Surface((20, 20))
-healthImage.fill((0, 255, 0))
 
 # Function to play intro video with skip button
 def play_intro_video(video_path):
@@ -128,19 +128,23 @@ def main_game():
         fireball_rate = level['fireball_rate']
         move_pattern = level['move_pattern']
         score = 0
+        enemy_throwing = False
+        throw_animation_timer = 0
 
         # Enemy setup
-        enemyImageSet = enemyImages[level['name']]
-        current_enemy_image = enemyImageSet['idle']
+        current_enemy_images = enemyImages[level['name']]
+        current_enemy_image = current_enemy_images['stand']
         enemyRect = current_enemy_image.get_rect()
         enemyRect.midtop = (WINDOW_WIDTH // 2, 50)
         fireballs = []
+        enemy_direction = 1  # Initial direction for left-right movement
 
         # Player setup
         playerRect = playerImage.get_rect()
         playerRect.midbottom = (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 20)
         hammers = []
         move_left = move_right = shooting = False
+        hammer_counter = 0  # For controlling hammer frequency
 
         # Game loop for current level
         while True:
@@ -169,10 +173,12 @@ def main_game():
             if move_right and playerRect.right < WINDOW_WIDTH:
                 playerRect.move_ip(PLAYER_MOVE_RATE, 0)
 
-            # Shooting mechanic
-            if shooting:
-                hammer_rect = pygame.Rect(playerRect.centerx, playerRect.top - 20, 10, 20)
+            # Shooting mechanic with reduced frequency
+            hammer_counter += 1
+            if shooting and hammer_counter >= HAMMER_FREQUENCY:
+                hammer_rect = hammerImage.get_rect(midbottom=(playerRect.centerx, playerRect.top))
                 hammers.append(hammer_rect)
+                hammer_counter = 0  # Reset counter
 
             # Move hammers
             for hammer in hammers[:]:
@@ -180,10 +186,22 @@ def main_game():
                 if hammer.top < 0:
                     hammers.remove(hammer)
 
-            # Enemy fireball shooting logic
+            # Enemy movement (left-right)
+            enemyRect.x += enemy_direction * 3  # Adjust speed as needed
+            if enemyRect.left <= 0 or enemyRect.right >= WINDOW_WIDTH:
+                enemy_direction *= -1  # Reverse direction at edges
+
+            # Enemy throw animation and fireball shooting
             if random.randint(1, fireball_rate) == 1:
-                fireball_rect = pygame.Rect(enemyRect.centerx, enemyRect.bottom, 10, 10)
+                fireball_rect = fireballImage.get_rect(midtop=(enemyRect.centerx, enemyRect.bottom))
                 fireballs.append(fireball_rect)
+                current_enemy_image = current_enemy_images['throw']
+                throw_animation_timer = 10  # Show throw image for a few frames
+
+            if throw_animation_timer > 0:
+                throw_animation_timer -= 1
+            else:
+                current_enemy_image = current_enemy_images['stand']
 
             # Move fireballs
             for fireball in fireballs[:]:
@@ -195,11 +213,15 @@ def main_game():
             for hammer in hammers[:]:
                 if hammer.colliderect(enemyRect):
                     hammers.remove(hammer)
-                    current_enemy_image = enemyImageSet['hit']
                     enemy_health -= 1
                     score += 10
                     if enemy_health <= 0:
-                        current_enemy_image = enemyImageSet['dead']
+                        # Show dead enemy image and level passed message
+                        windowSurface.fill(BACKGROUND_COLOR)
+                        windowSurface.blit(current_enemy_images['dead'], enemyRect)
+                        draw_text(f'Level {level_index + 1} passed!', WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2)
+                        pygame.display.update()
+                        pygame.time.wait(5000)  # Wait 5 seconds
                         level_index += 1
                         break
 
@@ -218,7 +240,7 @@ def main_game():
             windowSurface.fill(BACKGROUND_COLOR)
             draw_text(f'Score: {score}', 10, 10)
             draw_text(f'Health: {player_health}', WINDOW_WIDTH - 150, 10)
-            draw_text(f'Enemy Health: {enemy_health}', WINDOW_WIDTH // 2 - 50, 10)
+            draw_text(f'Enemy Health: {max(0, enemy_health)}', WINDOW_WIDTH // 2 - 50, 10)
             windowSurface.blit(playerImage, playerRect)
             windowSurface.blit(current_enemy_image, enemyRect)
 
