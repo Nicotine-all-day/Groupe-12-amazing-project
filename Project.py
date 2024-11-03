@@ -52,6 +52,8 @@ for level in LEVELS:
     enemyImages[level['name']]['dead'] = pygame.transform.scale(enemyImages[level['name']]['dead'], (WINDOW_WIDTH, WINDOW_HEIGHT))
 
 # Function to play intro video with skip button
+# Function to play intro video with skip button
+# Function to play intro video with skip button
 def play_intro_video(video_path):
     cap = cv2.VideoCapture(video_path)
     player = MediaPlayer(video_path)
@@ -64,6 +66,7 @@ def play_intro_video(video_path):
             break
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = pygame.surfarray.make_surface(frame)
+        frame = pygame.transform.rotate(frame, 180)  # Rotate the frame 180 degrees to the right
         frame = pygame.transform.scale(frame, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
         windowSurface.blit(frame, (0, 0))
@@ -87,6 +90,8 @@ def play_intro_video(video_path):
             img, t = audio_frame
     cap.release()
     player.close()
+
+
 
 # Utility functions
 def terminate():
