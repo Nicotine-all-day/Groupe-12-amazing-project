@@ -1,4 +1,3 @@
-# main.py
 
 import pygame
 import numpy as np
@@ -309,6 +308,7 @@ while running:
 
 # Quit Pygame
 pygame.quit()
+
 
 
 
