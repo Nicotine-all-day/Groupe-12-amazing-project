@@ -312,7 +312,6 @@ pygame.quit()
 
 
 
-=======
 # main.py
 
 import pygame
