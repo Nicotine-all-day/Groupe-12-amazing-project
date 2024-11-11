@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 import pygame
 import numpy as np
 import random  # Import random module for random jumps
