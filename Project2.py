@@ -129,8 +129,6 @@ running = True
 last_dash_time = 0  # Track the last time a dash was used
 dash_cooldown = 2  # Cooldown time in seconds for dash
 dash_distance = 100  # Distance covered in dash
-last_jump_time = 0  # Track the last time jump was pressed
-double_jump_window = 0.3  # Time window in seconds to detect double press for dash
 last_dash_time = 0  # Track the last time a dash was used
 dash_cooldown = 1  # Cooldown time in seconds for dash
 dash_distance = 100  # Distance covered in dash
@@ -153,17 +151,7 @@ while running:
     # Get keys pressed
     keys = pygame.key.get_pressed()
 
-    # Dash movement with double press of SPACE
-    current_time = time.time()
-    if keys[pygame.K_SPACE]:
-        if current_time - last_jump_time < double_jump_window and current_time - last_dash_time > dash_cooldown:
-            if facing_direction == "left":
-                player_x -= dash_distance
-            elif facing_direction == "right":
-                player_x += dash_distance
-            last_dash_time = current_time
-        last_jump_time = current_time
-
+    
     # Dash movement
     current_time = time.time()
     if keys[pygame.K_r] and current_time - last_dash_time > dash_cooldown:
