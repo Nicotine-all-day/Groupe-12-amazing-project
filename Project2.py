@@ -27,65 +27,8 @@ clock = pygame.time.Clock()
 def play_intro():
     clip = VideoFileClip('intro.mp4')
 
-<<<<<<< HEAD
     # Set up a basic skip button
     skip_button_rect = pygame.Rect(SCREEN_WIDTH - 120, SCREEN_HEIGHT - 50, 100, 30)
-=======
-# Player lives
-player_lives = 3
-
-# Gravity settings
-gravity = 1
-jump_strength = -20
-is_jumping = False
-
-# Platform settings
-platform_width = SCREEN_WIDTH
-platform_height = 20
-platform_x = 0
-platform_y = SCREEN_HEIGHT - 100
-
-# Small platform settings
-small_platform_width = 150
-small_platform_height = 20
-small_platform_x = SCREEN_WIDTH // 2 - small_platform_width // 2
-small_platform_y = SCREEN_HEIGHT - 250
-
-# Enemy settings
-enemy_width = 60
-enemy_height = 60
-enemy_x = 300
-enemy_y = platform_y - enemy_height
-enemy_velocity_x = 5  # Increase enemy speed to 5
-enemy_color = RED
-enemy_lives = 10  # Start with 10 health points for level one
-
-# Enemy jump settings
-enemy_gravity = 1
-enemy_jump_strength = -20  # Increase jump strength to make enemy jump higher
-enemy_velocity_y = 0
-enemy_is_jumping = False
-jump_timer = 0  # Used to trigger enemy jumps in a sequence
-jump_sequence = [60, 60, 90]  # Frames equivalent to 1 second, 1 second, and 1.5 seconds at 60 FPS
-sequence_index = 0
-
-# Hammer settings
-hammers = []  # List to store active hammers
-hammer_width = 10
-hammer_height = 10
-hammer_velocity_x = 7
-hammer_velocity_y_initial = -15
-last_hammer_time = 0  # Track the last time a hammer was thrown
-hammer_cooldown = 0.3  # Cooldown time in seconds between throws
-
-# Function to display start screen
-def start_screen():
-    screen.fill(WHITE)
-    font = pygame.font.Font(None, 74)
-    text = font.render("Level One", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
-
->>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
     font = pygame.font.Font(None, 36)
 
     # Play video in a loop until the user skips it
@@ -93,21 +36,22 @@ def start_screen():
     while True:
         screen.fill(BLACK)
 
-        # Draw the skip button
-        pygame.draw.rect(screen, RED, skip_button_rect)
-        skip_text = font.render("Skip", True, WHITE)
-        screen.blit(skip_text, (SCREEN_WIDTH - 110, SCREEN_HEIGHT - 45))
-        pygame.display.update()
-
         # Get current frame of the video
         current_time = time.time() - start_time
         if current_time < clip.duration:
             frame = clip.get_frame(current_time)
+            frame = (frame * 255).astype(np.uint8)  # Ensure frame is in uint8 format
             frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
             screen.blit(frame_surface, (0, 0))
         else:
             clip.close()
             return
+
+        # Draw the skip button
+        pygame.draw.rect(screen, RED, skip_button_rect)
+        skip_text = font.render("Skip", True, WHITE)
+        screen.blit(skip_text, (SCREEN_WIDTH - 110, SCREEN_HEIGHT - 45))
+        pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -124,8 +68,6 @@ play_intro()
 
 # Game main loop
 running = True
-<<<<<<< HEAD
-=======
 last_dash_time = 0  # Track the last time a dash was used
 dash_cooldown = 2  # Cooldown time in seconds for dash
 dash_distance = 100  # Distance covered in dash
@@ -135,8 +77,6 @@ dash_distance = 100  # Distance covered in dash
 invincible = False  # Flag to track if the player is invincible
 facing_direction = "right"  # Track the direction the player is facing
 level = 1  # Start at level one
-
->>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
 while running:
     screen.fill(WHITE)
 
@@ -145,9 +85,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-<<<<<<< HEAD
     # Update display
-=======
     # Get keys pressed
     keys = pygame.key.get_pressed()
 
@@ -326,7 +264,6 @@ while running:
     screen.blit(lives_text, (10, 10))
 
     # Update the display
->>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
     pygame.display.flip()
 
     # Control frame rate
