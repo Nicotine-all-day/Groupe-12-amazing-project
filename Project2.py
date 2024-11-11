@@ -634,4 +634,3 @@ while running:
 
 # Quit Pygame
 pygame.quit()
->>>>>>> ec91b6bc13990c1c44280aefbf966efcca2cdd25
