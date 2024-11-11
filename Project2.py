@@ -37,7 +37,7 @@ player_lives = 3
 
 # Gravity settings
 gravity = 1
-jump_strength = -25
+jump_strength = -20
 is_jumping = False
 
 # Platform settings
@@ -77,7 +77,7 @@ hammer_height = 10
 hammer_velocity_x = 7
 hammer_velocity_y_initial = -15
 last_hammer_time = 0  # Track the last time a hammer was thrown
-hammer_cooldown = 0.5  # Cooldown time in seconds between throws
+hammer_cooldown = 0.3  # Cooldown time in seconds between throws
 
 # Function to display start screen
 def start_screen():
@@ -141,6 +141,14 @@ start_screen()
 
 # Main game loop
 running = True
+last_dash_time = 0  # Track the last time a dash was used
+dash_cooldown = 2  # Cooldown time in seconds for dash
+dash_distance = 100  # Distance covered in dash
+last_jump_time = 0  # Track the last time jump was pressed
+double_jump_window = 0.3  # Time window in seconds to detect double press for dash
+last_dash_time = 0  # Track the last time a dash was used
+dash_cooldown = 1  # Cooldown time in seconds for dash
+dash_distance = 100  # Distance covered in dash
 invincible = False  # Flag to track if the player is invincible
 facing_direction = "right"  # Track the direction the player is facing
 level = 1  # Start at level one
@@ -153,6 +161,26 @@ while running:
 
     # Get keys pressed
     keys = pygame.key.get_pressed()
+
+    # Dash movement with double press of SPACE
+    current_time = time.time()
+    if keys[pygame.K_SPACE]:
+        if current_time - last_jump_time < double_jump_window and current_time - last_dash_time > dash_cooldown:
+            if facing_direction == "left":
+                player_x -= dash_distance
+            elif facing_direction == "right":
+                player_x += dash_distance
+            last_dash_time = current_time
+        last_jump_time = current_time
+
+    # Dash movement
+    current_time = time.time()
+    if keys[pygame.K_r] and current_time - last_dash_time > dash_cooldown:
+        if facing_direction == "left":
+            player_x -= dash_distance
+        elif facing_direction == "right":
+            player_x += dash_distance
+        last_dash_time = current_time
 
     # Activate invincibility if 'i' is pressed
     if keys[pygame.K_i]:
