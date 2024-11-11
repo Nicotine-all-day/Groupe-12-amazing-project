@@ -1,3 +1,4 @@
+# main.py
 
 import pygame
 import numpy as np
@@ -36,7 +37,7 @@ player_lives = 3
 
 # Gravity settings
 gravity = 1
-jump_strength = -20
+jump_strength = -25
 is_jumping = False
 
 # Platform settings
@@ -73,9 +74,10 @@ sequence_index = 0
 hammers = []  # List to store active hammers
 hammer_width = 10
 hammer_height = 10
-hammer_velocity = 10
+hammer_velocity_x = 7
+hammer_velocity_y_initial = -15
 last_hammer_time = 0  # Track the last time a hammer was thrown
-hammer_cooldown = 0.3  # Cooldown time in seconds between throws
+hammer_cooldown = 0.5  # Cooldown time in seconds between throws
 
 # Function to display start screen
 def start_screen():
@@ -87,6 +89,19 @@ def start_screen():
     font = pygame.font.Font(None, 36)
     text = font.render("Press SPACE to Start", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
+
+    font = pygame.font.Font(None, 28)
+    commands_text = [
+        "Commands:",
+        "Move Left: A",
+        "Move Right: D",
+        "Jump: SPACE",
+        "Drop Down (Level 2): S",
+        "Throw Hammer: W"
+    ]
+    for i, line in enumerate(commands_text):
+        text = font.render(line, True, BLACK)
+        screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60 + i * 30))
 
     pygame.display.flip()
 
@@ -139,10 +154,10 @@ while running:
     keys = pygame.key.get_pressed()
 
     # Horizontal movement
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_a]:
         player_x -= player_velocity_x
         facing_direction = "left"
-    if keys[pygame.K_RIGHT]:
+    if keys[pygame.K_d]:
         player_x += player_velocity_x
         facing_direction = "right"
 
@@ -158,21 +173,16 @@ while running:
         is_jumping = True
 
     # Drop down through small platform (only in level two)
-    if level == 2 and keys[pygame.K_DOWN] and (small_platform_x < player_x < small_platform_x + small_platform_width) and (player_y + player_height == small_platform_y):
+    if level == 2 and keys[pygame.K_s] and (small_platform_x < player_x < small_platform_x + small_platform_width) and (player_y + player_height == small_platform_y):
         player_y += 5  # Move the player down slightly to allow dropping through the platform
 
     # Throw hammer with cooldown
     current_time = time.time()
-    if keys[pygame.K_v] and current_time - last_hammer_time > hammer_cooldown:
+    if keys[pygame.K_w] and current_time - last_hammer_time > hammer_cooldown:
         if facing_direction == "left":
-            hammers.append({"x": player_x, "y": player_y + player_height // 2, "vx": -hammer_velocity, "vy": 0})
+            hammers.append({"x": player_x, "y": player_y, "vx": -hammer_velocity_x, "vy": hammer_velocity_y_initial})
         elif facing_direction == "right":
-            hammers.append({"x": player_x + player_width, "y": player_y + player_height // 2, "vx": hammer_velocity, "vy": 0})
-        last_hammer_time = current_time
-
-    # Throw hammer upward with cooldown
-    if keys[pygame.K_b] and current_time - last_hammer_time > hammer_cooldown:
-        hammers.append({"x": player_x + player_width // 2, "y": player_y, "vx": 0, "vy": -hammer_velocity})
+            hammers.append({"x": player_x + player_width, "y": player_y, "vx": hammer_velocity_x, "vy": hammer_velocity_y_initial})
         last_hammer_time = current_time
 
     # Apply gravity
@@ -229,6 +239,7 @@ while running:
     for hammer in hammers:
         hammer["x"] += hammer["vx"]
         hammer["y"] += hammer["vy"]
+        hammer["vy"] += gravity  # Apply gravity to the hammer for a parabolic arc
 
     # Remove hammers that go off-screen
     hammers = [hammer for hammer in hammers if 0 <= hammer["x"] <= SCREEN_WIDTH and 0 <= hammer["y"] <= SCREEN_HEIGHT]
@@ -308,8 +319,3 @@ while running:
 
 # Quit Pygame
 pygame.quit()
-
-
-
-
-
