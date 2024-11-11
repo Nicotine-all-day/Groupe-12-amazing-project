@@ -1,9 +1,9 @@
-# main.py
-
 import pygame
 import numpy as np
 import random  # Import random module for random jumps
 import time  # Import time module for timing hammer throws
+from moviepy.editor import VideoFileClip
+import sys
 
 # Initialize Pygame
 pygame.init()
@@ -23,15 +23,14 @@ BLACK = (0, 0, 0)
 # Clock for controlling frame rate
 clock = pygame.time.Clock()
 
-# Player settings
-player_width = 30
-player_height = 30
-player_x = 100
-player_y = SCREEN_HEIGHT - player_height - 100  # Start position
-player_velocity_x = 6
-player_velocity_y = 0
-player_color = GREEN
+# Function to play the intro video with a skip button
+def play_intro():
+    clip = VideoFileClip('intro.mp4')
 
+<<<<<<< HEAD
+    # Set up a basic skip button
+    skip_button_rect = pygame.Rect(SCREEN_WIDTH - 120, SCREEN_HEIGHT - 50, 100, 30)
+=======
 # Player lives
 player_lives = 3
 
@@ -86,61 +85,47 @@ def start_screen():
     text = font.render("Level One", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
+>>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
     font = pygame.font.Font(None, 36)
-    text = font.render("Press SPACE to Start", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
 
-    font = pygame.font.Font(None, 28)
-    commands_text = [
-        "Commands:",
-        "Move Left: A",
-        "Move Right: D",
-        "Jump: SPACE",
-        "Drop Down (Level 2): S",
-        "Throw Hammer: W"
-    ]
-    for i, line in enumerate(commands_text):
-        text = font.render(line, True, BLACK)
-        screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60 + i * 30))
+    # Play video in a loop until the user skips it
+    start_time = time.time()
+    while True:
+        screen.fill(BLACK)
 
-    pygame.display.flip()
+        # Draw the skip button
+        pygame.draw.rect(screen, RED, skip_button_rect)
+        skip_text = font.render("Skip", True, WHITE)
+        screen.blit(skip_text, (SCREEN_WIDTH - 110, SCREEN_HEIGHT - 45))
+        pygame.display.update()
 
-    waiting = True
-    while waiting:
+        # Get current frame of the video
+        current_time = time.time() - start_time
+        if current_time < clip.duration:
+            frame = clip.get_frame(current_time)
+            frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
+            screen.blit(frame_surface, (0, 0))
+        else:
+            clip.close()
+            return
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                waiting = False
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if skip_button_rect.collidepoint(event.pos):
+                    # Stop the video and return to the game
+                    clip.close()
+                    return
 
-# Function to display victory screen
-def victory_screen():
-    screen.fill(WHITE)
-    font = pygame.font.Font(None, 74)
-    text = font.render("Congratulations!", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
+# Play the intro video with a skip button
+play_intro()
 
-    font = pygame.font.Font(None, 36)
-    text = font.render("Press SPACE to Start Level Two", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
-
-    pygame.display.flip()
-
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                waiting = False
-
-# Display the start screen
-start_screen()
-
-# Main game loop
+# Game main loop
 running = True
+<<<<<<< HEAD
+=======
 last_dash_time = 0  # Track the last time a dash was used
 dash_cooldown = 2  # Cooldown time in seconds for dash
 dash_distance = 100  # Distance covered in dash
@@ -153,12 +138,18 @@ invincible = False  # Flag to track if the player is invincible
 facing_direction = "right"  # Track the direction the player is facing
 level = 1  # Start at level one
 
+>>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
 while running:
+    screen.fill(WHITE)
+
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+<<<<<<< HEAD
+    # Update display
+=======
     # Get keys pressed
     keys = pygame.key.get_pressed()
 
@@ -347,10 +338,10 @@ while running:
     screen.blit(lives_text, (10, 10))
 
     # Update the display
+>>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
     pygame.display.flip()
 
-    # Cap the frame rate
-    clock.tick(60)  # 60 FPS
+    # Control frame rate
+    clock.tick(60)
 
-# Quit Pygame
 pygame.quit()
