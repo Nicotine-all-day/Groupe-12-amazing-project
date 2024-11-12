@@ -84,8 +84,6 @@ def start_screen():
     font = pygame.font.Font(None, 74)
     text = font.render("Level One", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
-
->>>>>>> 91e191ca065b4b1c1225dff3062f611f11893396
     font = pygame.font.Font(None, 36)
 
     # Play video in a loop until the user skips it
