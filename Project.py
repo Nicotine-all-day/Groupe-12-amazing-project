@@ -25,9 +25,9 @@ LEVEL_TITLES = ['Level 1: The Princess Challenge', 'Level 2: Luigi Showdown', 'L
 
 # Level configurations
 LEVELS = [
-    {'name': 'Princess', 'health': 10, 'fireball_speed': 4, 'fireball_rate': 90, 'move_pattern': 'random'},
-    {'name': 'Luigi', 'health': 20, 'fireball_speed': 6, 'fireball_rate': 100, 'move_pattern': 'random_jump'},
-    {'name': 'Mario', 'health': 40, 'fireball_speed': 8, 'fireball_rate': 110, 'move_pattern': 'aggressive'}
+    {'name': 'Princess', 'health': 10, 'fireball_speed': 4, 'fireball_rate': 90, 'move_pattern': 'random', 'enemy_move_rate': 3, 'enemy_dodge_chance': 0.02},
+    {'name': 'Luigi', 'health': 20, 'fireball_speed': 6, 'fireball_rate': 100, 'move_pattern': 'random_jump', 'enemy_move_rate': 4, 'enemy_dodge_chance': 0.05},
+    {'name': 'Mario', 'health': 40, 'fireball_speed': 8, 'fireball_rate': 110, 'move_pattern': 'aggressive', 'enemy_move_rate': 5, 'enemy_dodge_chance': 0.08}
 ]
 
 # Initialize pygame
@@ -39,7 +39,7 @@ pygame.display.set_caption('Hammer Bro: Power of Vengeance')
 # Load resources
 font = pygame.font.SysFont(None, 48)
 hammerImage = pygame.image.load('hammer.png').convert_alpha()
-hammerImage = pygame.transform.scale(hammerImage, (int(30 * SCALE_FACTOR_PLAYER), int(20 * SCALE_FACTOR_PLAYER)))
+hammerImage = pygame.transform.scale(hammerImage, (int(60 * SCALE_FACTOR_PLAYER), int(40 * SCALE_FACTOR_PLAYER)))  # Double the hammer size
 fireballImage = pygame.image.load('fireball.png').convert_alpha()
 fireballImage = pygame.transform.scale(fireballImage, (20, 20))
 
@@ -77,6 +77,12 @@ def wait_for_key_press():
                     terminate()
                 return
 
+def display_win_screen():
+    windowSurface.fill((255, 255, 255))  # Fill screen with white color
+    draw_text('YOU WIN!', WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2, color=(0, 0, 0))  # Display 'YOU WIN!' message
+    pygame.display.update()
+    pygame.time.wait(2000)  # Wait for 2 seconds before ending game
+
 # Main game setup and play function
 def main_game():
     level_index = 0
@@ -85,7 +91,7 @@ def main_game():
     while level_index < len(LEVELS):
         # Game setup for current level
         level = LEVELS[level_index]
-        enemy_health = level['health']
+        enemy_health = level['health']  # Ensure correct enemy health is set for each level
         score = 0
 
         # Display level start title
@@ -107,6 +113,8 @@ def main_game():
         hammer_counter = 0
         fireball_counter = 0
         enemy_direction = random.choice([-1, 1])  # Enemy starts by moving left or right
+        enemy_move_rate = level['enemy_move_rate']
+        enemy_dodge_chance = level['enemy_dodge_chance']
 
         # Main game loop for current level
         while True:
@@ -168,12 +176,12 @@ def main_game():
                     hammers.remove(hammer)
 
             # Enemy movement - dodging hammers
-            enemyRect.x += enemy_direction * ENEMY_MOVE_RATE
+            enemyRect.x += enemy_direction * enemy_move_rate
             if enemyRect.left <= 0 or enemyRect.right >= WINDOW_WIDTH:
                 enemy_direction *= -1
 
             # Random chance for the enemy to change direction to dodge hammers
-            if random.random() < ENEMY_DODGE_CHANCE:
+            if random.random() < enemy_dodge_chance:
                 enemy_direction *= -1
 
             # Enemy shooting fireballs
@@ -196,16 +204,16 @@ def main_game():
                     enemy_health -= 1
                     score += 10
                     if enemy_health <= 0:
+                        # Update level index and ensure correct enemy image
                         draw_text(f'Level {level_index + 1} Cleared!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
                         pygame.display.update()
                         pygame.time.wait(2000)
                         level_index += 1
                         if level_index >= len(LEVELS):
-                            draw_text('You Win!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
-                            pygame.display.update()
+                            display_win_screen()  # Show final win screen
                             wait_for_key_press()
                             return
-                        break
+                        break  # Exit loop to load next level
 
             # Check for fireball collision with player
             for fireball in fireballs[:]:
