@@ -91,7 +91,7 @@ def main_game():
     while level_index < len(LEVELS):
         # Game setup for current level
         level = LEVELS[level_index]
-        enemy_health = level['health']  # Ensure correct enemy health is set for each level
+        enemy_health = LEVELS[level_index]['health']  # Ensure correct enemy health is set for each level
         score = 0
 
         # Display level start title
@@ -204,11 +204,14 @@ def main_game():
                     enemy_health -= 1
                     score += 10
                     if enemy_health <= 0:
+                        enemy_health = 0  # Ensure health does not go negative
                         # Update level index and ensure correct enemy image
                         draw_text(f'Level {level_index + 1} Cleared!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
                         pygame.display.update()
                         pygame.time.wait(2000)
                         level_index += 1
+                        if level_index < len(LEVELS):
+                            enemy_health = LEVELS[level_index]['health']  # Reset enemy health for next level
                         if level_index >= len(LEVELS):
                             display_win_screen()  # Show final win screen
                             wait_for_key_press()
