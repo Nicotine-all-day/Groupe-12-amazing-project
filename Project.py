@@ -16,6 +16,8 @@ HAMMER_FREQUENCY = 30
 MAX_HEALTH = 3
 SCALE_FACTOR_PLAYER = 0.25
 SCALE_FACTOR_ENEMY = 0.5
+ENEMY_MOVE_RATE = 3
+ENEMY_DODGE_CHANCE = 0.02
 
 # Colors and visuals
 LEVEL_COLORS = [(135, 206, 250), (60, 179, 113), (255, 182, 193)]
@@ -104,6 +106,7 @@ def main_game():
         move_left = move_right = shooting = False
         hammer_counter = 0
         fireball_counter = 0
+        enemy_direction = random.choice([-1, 1])  # Enemy starts by moving left or right
 
         # Main game loop for current level
         while True:
@@ -163,6 +166,15 @@ def main_game():
                 hammer.top -= HAMMER_SPEED
                 if hammer.top < 0:
                     hammers.remove(hammer)
+
+            # Enemy movement - dodging hammers
+            enemyRect.x += enemy_direction * ENEMY_MOVE_RATE
+            if enemyRect.left <= 0 or enemyRect.right >= WINDOW_WIDTH:
+                enemy_direction *= -1
+
+            # Random chance for the enemy to change direction to dodge hammers
+            if random.random() < ENEMY_DODGE_CHANCE:
+                enemy_direction *= -1
 
             # Enemy shooting fireballs
             fireball_counter += 1
