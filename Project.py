@@ -26,8 +26,8 @@ LEVEL_TITLES = ['Level 1: The Princess Challenge', 'Level 2: Luigi Showdown', 'L
 # Level configurations
 LEVELS = [
     {'name': 'Princess', 'health': 10, 'fireball_speed': 4, 'fireball_rate': 90, 'move_pattern': 'random', 'enemy_move_rate': 3, 'enemy_dodge_chance': 0.02},
-    {'name': 'Luigi', 'health': 20, 'fireball_speed': 6, 'fireball_rate': 100, 'move_pattern': 'random_jump', 'enemy_move_rate': 4, 'enemy_dodge_chance': 0.05},
-    {'name': 'Mario', 'health': 40, 'fireball_speed': 8, 'fireball_rate': 110, 'move_pattern': 'aggressive', 'enemy_move_rate': 5, 'enemy_dodge_chance': 0.08}
+    {'name': 'Luigi', 'health': 20, 'fireball_speed': 4.6, 'fireball_rate': 76, 'move_pattern': 'random_jump', 'enemy_move_rate': 3.45, 'enemy_dodge_chance': 0.023},
+    {'name': 'Mario', 'health': 40, 'fireball_speed': 5.3, 'fireball_rate': 64, 'move_pattern': 'aggressive', 'enemy_move_rate': 3.97, 'enemy_dodge_chance': 0.026}
 ]
 
 # Initialize pygame
@@ -39,7 +39,7 @@ pygame.display.set_caption('Hammer Bro: Power of Vengeance')
 # Load resources
 font = pygame.font.SysFont(None, 48)
 hammerImage = pygame.image.load('hammer.png').convert_alpha()
-hammerImage = pygame.transform.scale(hammerImage, (int(60 * SCALE_FACTOR_PLAYER), int(40 * SCALE_FACTOR_PLAYER)))  # Double the hammer size
+hammerImage = pygame.transform.scale(hammerImage, (int(60 * SCALE_FACTOR_PLAYER), int(40 * SCALE_FACTOR_PLAYER)))
 fireballImage = pygame.image.load('fireball.png').convert_alpha()
 fireballImage = pygame.transform.scale(fireballImage, (20, 20))
 
@@ -94,6 +94,13 @@ def main_game():
         enemy_health = LEVELS[level_index]['health']  # Ensure correct enemy health is set for each level
         score = 0
 
+        # Scale hammer and player size for each level
+        current_scale_factor_player = SCALE_FACTOR_PLAYER * (1 + 0.05 * level_index)
+        current_hammer_scale = SCALE_FACTOR_PLAYER * (1 + 0.10 * level_index)
+
+        hammerImage_scaled = pygame.transform.scale(hammerImage, (int(60 * current_hammer_scale), int(40 * current_hammer_scale)))
+        playerImage_scaled = pygame.transform.scale(playerImage, (int(100 * current_scale_factor_player), int(120 * current_scale_factor_player)))
+
         # Display level start title
         windowSurface.fill(LEVEL_COLORS[level_index])
         draw_text(LEVEL_TITLES[level_index], WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2, color=(255, 255, 255))
@@ -101,7 +108,7 @@ def main_game():
         pygame.time.wait(3000)
 
         # Set up player and enemy positions
-        playerRect = playerImage.get_rect(midbottom=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 20))
+        playerRect = playerImage_scaled.get_rect(midbottom=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 20))
         current_enemy_images = enemyImages[level['name']]
         enemyRect = current_enemy_images['stand'].get_rect(midtop=(WINDOW_WIDTH // 2, 50))
 
@@ -115,6 +122,8 @@ def main_game():
         enemy_direction = random.choice([-1, 1])  # Enemy starts by moving left or right
         enemy_move_rate = level['enemy_move_rate']
         enemy_dodge_chance = level['enemy_dodge_chance']
+        fireball_speed = level['fireball_speed']
+        fireball_rate = level['fireball_rate']
 
         # Main game loop for current level
         while True:
@@ -122,12 +131,12 @@ def main_game():
             draw_text(f'Score: {score}', 10, 10)
             draw_text(f'Health: {player_health}', WINDOW_WIDTH - 150, 10)
             draw_text(f'Enemy Health: {max(0, enemy_health)}', WINDOW_WIDTH // 2 - 50, 10)
-            windowSurface.blit(playerImage, playerRect)
+            windowSurface.blit(playerImage_scaled, playerRect)
             windowSurface.blit(current_enemy_images['stand'], enemyRect)
 
             # Draw hammers
             for hammer in hammers:
-                windowSurface.blit(hammerImage, hammer)
+                windowSurface.blit(hammerImage_scaled, hammer)
 
             # Draw fireballs
             for fireball in fireballs:
@@ -165,7 +174,7 @@ def main_game():
             # Shooting mechanic
             hammer_counter += 1
             if shooting and hammer_counter >= HAMMER_FREQUENCY:
-                hammer_rect = hammerImage.get_rect(midbottom=(playerRect.centerx, playerRect.top))
+                hammer_rect = hammerImage_scaled.get_rect(midbottom=(playerRect.centerx, playerRect.top))
                 hammers.append(hammer_rect)
                 hammer_counter = 0
 
@@ -186,14 +195,14 @@ def main_game():
 
             # Enemy shooting fireballs
             fireball_counter += 1
-            if fireball_counter >= level['fireball_rate']:
+            if fireball_counter >= fireball_rate:
                 fireball_rect = fireballImage.get_rect(midtop=(enemyRect.centerx, enemyRect.bottom))
                 fireballs.append(fireball_rect)
                 fireball_counter = 0
 
             # Move fireballs
             for fireball in fireballs[:]:
-                fireball.top += level['fireball_speed']
+                fireball.top += fireball_speed
                 if fireball.top > WINDOW_HEIGHT:
                     fireballs.remove(fireball)
 
