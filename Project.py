@@ -98,8 +98,8 @@ def main_game():
         current_scale_factor_player = SCALE_FACTOR_PLAYER * (1 + 0.05 * level_index)
         current_hammer_scale = SCALE_FACTOR_PLAYER * (1 + 0.10 * level_index)
 
-        hammerImage_scaled = pygame.transform.scale(hammerImage, (int(60 * current_hammer_scale), int(40 * current_hammer_scale)))
-        playerImage_scaled = pygame.transform.scale(playerImage, (int(100 * current_scale_factor_player), int(120 * current_scale_factor_player)))
+        hammerImage_scaled = pygame.transform.scale(pygame.image.load('hammer.png').convert_alpha(), (int(60 * current_hammer_scale), int(40 * current_hammer_scale)))
+        playerImage_scaled = pygame.transform.scale(pygame.image.load('hammer_bro.png').convert_alpha(), (int(100 * current_scale_factor_player), int(120 * current_scale_factor_player)))
 
         # Display level start title
         windowSurface.fill(LEVEL_COLORS[level_index])
