@@ -17,6 +17,10 @@ MAX_HEALTH = 3
 SCALE_FACTOR_PLAYER = 0.25
 SCALE_FACTOR_ENEMY = 0.5
 
+# Colors and visuals
+LEVEL_COLORS = [(135, 206, 250), (60, 179, 113), (255, 182, 193)]
+LEVEL_TITLES = ['Level 1: The Princess Challenge', 'Level 2: Luigi Showdown', 'Level 3: Mario Finale']
+
 # Level configurations
 LEVELS = [
     {'name': 'Princess', 'health': 10, 'fireball_speed': 4, 'fireball_rate': 90, 'move_pattern': 'random'},
@@ -82,34 +86,125 @@ def main_game():
         enemy_health = level['health']
         score = 0
 
+        # Display level start title
+        windowSurface.fill(LEVEL_COLORS[level_index])
+        draw_text(LEVEL_TITLES[level_index], WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2, color=(255, 255, 255))
+        pygame.display.update()
+        pygame.time.wait(3000)
+
         # Set up player and enemy positions
         playerRect = playerImage.get_rect(midbottom=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 20))
         current_enemy_images = enemyImages[level['name']]
         enemyRect = current_enemy_images['stand'].get_rect(midtop=(WINDOW_WIDTH // 2, 50))
 
-        # Initialize animation timer
+        # Initialize animation timer and hammer list
         throw_animation_timer = 0
+        hammers = []
+        fireballs = []
+        move_left = move_right = shooting = False
+        hammer_counter = 0
+        fireball_counter = 0
 
         # Main game loop for current level
         while True:
-            windowSurface.fill(BACKGROUND_COLOR)
+            windowSurface.fill(LEVEL_COLORS[level_index])
             draw_text(f'Score: {score}', 10, 10)
             draw_text(f'Health: {player_health}', WINDOW_WIDTH - 150, 10)
             draw_text(f'Enemy Health: {max(0, enemy_health)}', WINDOW_WIDTH // 2 - 50, 10)
             windowSurface.blit(playerImage, playerRect)
             windowSurface.blit(current_enemy_images['stand'], enemyRect)
+
+            # Draw hammers
+            for hammer in hammers:
+                windowSurface.blit(hammerImage, hammer)
+
+            # Draw fireballs
+            for fireball in fireballs:
+                windowSurface.blit(fireballImage, fireball)
+
             pygame.display.update()
 
+            # Event handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         terminate()
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        move_left = True
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        move_right = True
+                    if event.key == pygame.K_SPACE:
+                        shooting = True
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        move_left = False
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        move_right = False
+                    if event.key == pygame.K_SPACE:
+                        shooting = False
 
-            # Decrease animation timer if active
-            if throw_animation_timer > 0:
-                throw_animation_timer -= 1
+            # Player movement
+            if move_left and playerRect.left > 0:
+                playerRect.move_ip(-PLAYER_MOVE_RATE, 0)
+            if move_right and playerRect.right < WINDOW_WIDTH:
+                playerRect.move_ip(PLAYER_MOVE_RATE, 0)
+
+            # Shooting mechanic
+            hammer_counter += 1
+            if shooting and hammer_counter >= HAMMER_FREQUENCY:
+                hammer_rect = hammerImage.get_rect(midbottom=(playerRect.centerx, playerRect.top))
+                hammers.append(hammer_rect)
+                hammer_counter = 0
+
+            # Move hammers
+            for hammer in hammers[:]:
+                hammer.top -= HAMMER_SPEED
+                if hammer.top < 0:
+                    hammers.remove(hammer)
+
+            # Enemy shooting fireballs
+            fireball_counter += 1
+            if fireball_counter >= level['fireball_rate']:
+                fireball_rect = fireballImage.get_rect(midtop=(enemyRect.centerx, enemyRect.bottom))
+                fireballs.append(fireball_rect)
+                fireball_counter = 0
+
+            # Move fireballs
+            for fireball in fireballs[:]:
+                fireball.top += level['fireball_speed']
+                if fireball.top > WINDOW_HEIGHT:
+                    fireballs.remove(fireball)
+
+            # Check for hammer collision with enemy
+            for hammer in hammers[:]:
+                if hammer.colliderect(enemyRect):
+                    hammers.remove(hammer)
+                    enemy_health -= 1
+                    score += 10
+                    if enemy_health <= 0:
+                        draw_text(f'Level {level_index + 1} Cleared!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
+                        pygame.display.update()
+                        pygame.time.wait(2000)
+                        level_index += 1
+                        if level_index >= len(LEVELS):
+                            draw_text('You Win!', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
+                            pygame.display.update()
+                            wait_for_key_press()
+                            return
+                        break
+
+            # Check for fireball collision with player
+            for fireball in fireballs[:]:
+                if fireball.colliderect(playerRect):
+                    fireballs.remove(fireball)
+                    player_health -= 1
+                    if player_health <= 0:
+                        draw_text('Game Over', WINDOW_WIDTH // 3, WINDOW_HEIGHT // 3)
+                        pygame.display.update()
+                        wait_for_key_press()
+                        return
 
             mainClock.tick(FPS)
 
