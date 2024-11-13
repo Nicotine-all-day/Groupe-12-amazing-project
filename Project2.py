@@ -80,7 +80,8 @@ last_hammer_time = 0  # Track the last time a hammer was thrown
 hammer_cooldown = 0.3  # Cooldown time in seconds between throws
 
 # Intro video settings
-video_path = "Groupe-12-amazing-project/intro.mp4"
+video_path = "intro.mp4"
+
 
 
 # Function to display the intro video with skip button
