@@ -4,6 +4,8 @@ import pygame
 import numpy as np
 import random  # Import random module for random jumps
 import time  # Import time module for timing hammer throws
+import os  # Import os for file path handling
+import cv2  # Import OpenCV for video playback
 
 # Initialize Pygame
 pygame.init()
@@ -77,6 +79,55 @@ hammer_velocity_y_initial = -15
 last_hammer_time = 0  # Track the last time a hammer was thrown
 hammer_cooldown = 0.3  # Cooldown time in seconds between throws
 
+# Intro video settings
+video_path = "intro.mp4"
+
+# Function to display the intro video with skip button
+def play_intro_video():
+    if not os.path.exists(video_path):
+        print(f"Error: {video_path} not found.")
+        return  # If the video file doesn't exist, skip the video
+
+    cap = cv2.VideoCapture(video_path)
+    video_playing = True
+
+    while video_playing and cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Convert the frame to RGB format
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = np.rot90(frame)
+        frame = pygame.surfarray.make_surface(frame)
+        screen.blit(frame, (0, 0))
+
+        # Draw the skip button
+        font = pygame.font.Font(None, 36)
+        skip_text = font.render("Skip", True, BLACK, WHITE)
+        skip_rect = skip_text.get_rect(topleft=(10, SCREEN_HEIGHT - 50))
+        screen.blit(skip_text, skip_rect)
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                cap.release()
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                video_playing = False  # Skip video
+
+        # Check for mouse click on skip button
+        mouse_click = pygame.mouse.get_pressed()
+        mouse_pos = pygame.mouse.get_pos()
+        if mouse_click[0] and skip_rect.collidepoint(mouse_pos):
+            video_playing = False  # Skip video
+
+        pygame.display.flip()
+        clock.tick(30)  # Set frame rate for video playback
+
+    cap.release()
+
 # Function to display start screen
 def start_screen():
     screen.fill(WHITE)
@@ -132,6 +183,9 @@ def victory_screen():
                 exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 waiting = False
+
+# Play the intro video
+play_intro_video()
 
 # Display the start screen
 start_screen()
@@ -339,5 +393,5 @@ while running:
     # Cap the frame rate
     clock.tick(60)  # 60 FPS
 
-# Quit Pygame 
+# Quit Pygame 
 pygame.quit()
