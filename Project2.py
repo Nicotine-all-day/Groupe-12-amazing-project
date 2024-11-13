@@ -68,7 +68,6 @@ enemy_jump_strength = -20  # Increase jump strength to make enemy jump higher
 enemy_velocity_y = 0
 enemy_is_jumping = False
 jump_timer = 0  # Used to trigger enemy jumps in a sequence
-jump_sequence = [60, 60, 90]  # Frames equivalent to 1 second, 1 second, and 1.5 seconds at 60 FPS
 sequence_index = 0
 
 # Hammer settings
@@ -199,6 +198,12 @@ dash_distance = 100  # Distance covered in dash
 invincible = False  # Flag to track if the player is invincible
 facing_direction = "right"  # Track the direction the player is facing
 level = 1  # Start at level one
+if level == 1:
+    jump_sequence = [60, 60, 90]  
+elif level == 2:
+    jump_sequence = [60, 90, 60, 90]
+elif level == 3:
+    jump_sequence = random.randint(60, 90)
 
 while running:
     # Handle events
