@@ -3,8 +3,8 @@
 import pygame
 import random
 import sys
-import cv2
 from pygame.locals import *
+import moviepy.editor as mp
 
 # Constants for screen dimensions, colors, and game properties
 WINDOW_WIDTH, WINDOW_HEIGHT = 880, 660
@@ -84,38 +84,26 @@ def display_win_screen():
     pygame.display.update()
     pygame.time.wait(2000)  # Wait for 2 seconds before ending game
 
-# Function to play intro video using OpenCV
+# Function to play intro video using moviepy
 def play_intro():
-    cap = cv2.VideoCapture('intro.mp4')
+    clip = mp.VideoFileClip('intro.mp4')
+    clip.preview()
+    windowSurface.fill((0, 0, 0))
+    draw_text('Press SPACE to Skip', 10, WINDOW_HEIGHT - 50, color=(255, 255, 255))
+    pygame.display.update()
+    skip = False
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = cv2.transpose(frame)
-        frame_surface = pygame.surfarray.make_surface(frame)
-        frame_surface = pygame.transform.scale(frame_surface, (WINDOW_WIDTH, WINDOW_HEIGHT))
-        windowSurface.blit(frame_surface, (0, 0))
-        draw_text('Press S to Skip', 10, WINDOW_HEIGHT - 50, color=(255, 255, 255))
-        pygame.display.update()
-
+    while clip.is_playing() and not skip:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                cap.release()
                 terminate()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    cap.release()
                     terminate()
-                if event.key == pygame.K_s:
-                    cap.release()
-                    return
+                if event.key == pygame.K_SPACE:
+                    clip.close()
+                    skip = True
 
-        mainClock.tick(FPS)
-
-    cap.release()
 
 def main_game():
     play_intro()  # Play the intro video before starting the game
