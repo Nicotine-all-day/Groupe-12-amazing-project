@@ -5,7 +5,6 @@ import numpy as np
 import random  # Import random module for random jumps
 import time  # Import time module for timing hammer throws
 import os  # Import os for file path handling
-import cv2  # Import OpenCV for video playback
 
 # Initialize Pygame
 pygame.init()
@@ -68,6 +67,7 @@ enemy_jump_strength = -20  # Increase jump strength to make enemy jump higher
 enemy_velocity_y = 0
 enemy_is_jumping = False
 jump_timer = 0  # Used to trigger enemy jumps in a sequence
+jump_sequence = [60, 60, 90]  # Frames equivalent to 1 second, 1 second, and 1.5 seconds at 60 FPS
 sequence_index = 0
 
 # Hammer settings
@@ -82,53 +82,50 @@ hammer_cooldown = 0.3  # Cooldown time in seconds between throws
 # Intro video settings
 video_path = "intro.mp4"
 
-
-
 # Function to display the intro video with skip button
 def play_intro_video():
+    # Check if the video file exists
     if not os.path.exists(video_path):
         print(f"Error: {video_path} not found.")
         return  # If the video file doesn't exist, skip the video
 
-    cap = cv2.VideoCapture(video_path)
+    # Load video
+    movie = pygame.movie.Movie(video_path)
+    screen.fill(BLACK)
+    video_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    movie.set_display(video_surface)
+    movie.play()
+
+    # Video playback loop with skip button
     video_playing = True
-
-    while video_playing and cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # Convert the frame to RGB format and display it in Pygame
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = np.fliplr(np.rot90(frame))  # Rotate to match Pygame's coordinate system
-        frame_surface = pygame.surfarray.make_surface(frame)
-        screen.blit(frame_surface, (0, 0))
-
-        # Draw the skip button
-        font = pygame.font.Font(None, 36)
-        skip_text = font.render("Skip", True, BLACK, WHITE)
-        skip_rect = skip_text.get_rect(topleft=(10, SCREEN_HEIGHT - 50))
-        screen.blit(skip_text, skip_rect)
-
-        # Handle events
+    while video_playing:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                cap.release()
+                movie.stop()
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                movie.stop()
                 video_playing = False  # Skip video
+
+        # Draw the video frame
+        screen.blit(video_surface, (0, 0))
+
+        # Draw the skip button
+        font = pygame.font.Font(None, 36)
+        skip_text = font.render("Skip", True, WHITE)
+        skip_rect = skip_text.get_rect(topleft=(10, SCREEN_HEIGHT - 50))
+        screen.blit(skip_text, skip_rect)
 
         # Check for mouse click on skip button
         mouse_click = pygame.mouse.get_pressed()
         mouse_pos = pygame.mouse.get_pos()
         if mouse_click[0] and skip_rect.collidepoint(mouse_pos):
+            movie.stop()
             video_playing = False  # Skip video
 
         pygame.display.update()
-        clock.tick(30)  # Set frame rate for video playback
-
-    cap.release()
+        clock.tick(60)
 
 # Function to display start screen
 def start_screen():
@@ -200,13 +197,6 @@ dash_distance = 100  # Distance covered in dash
 invincible = False  # Flag to track if the player is invincible
 facing_direction = "right"  # Track the direction the player is facing
 level = 1  # Start at level one
-# jump sequences
-if level == 1:
-    jump_sequence = [60, 60, 90]  
-elif level == 2:
-    jump_sequence = [60, 90, 60, 90]
-elif level == 3:
-    jump_sequence = random.randint(60, 90)
 
 while running:
     # Handle events
