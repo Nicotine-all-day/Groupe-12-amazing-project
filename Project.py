@@ -4,6 +4,7 @@ import pygame
 import numpy as np
 import random  # Import random module for random jumps
 import time  # Import time module for timing hammer throws
+import os  # Import os for file path handling
 
 # Initialize Pygame
 pygame.init()
@@ -333,5 +334,5 @@ while running:
     # Cap the frame rate
     clock.tick(60)  # 60 FPS
 
-# Quit Pygame 
+# Quit Pygame 
 pygame.quit()
