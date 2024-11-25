@@ -212,9 +212,9 @@ while running:
                 player_x += dash_distance
             last_dash_time = current_time
 
-        # Activate invincibility if 'i' is pressed
+        # Toggle invincibility if 'i' is pressed
         if keys[pygame.K_i]:
-            invincible = True
+            invincible = not invincible
 
         # Horizontal movement
         if keys[pygame.K_a]:
@@ -234,6 +234,14 @@ while running:
         if keys[pygame.K_SPACE] and not is_jumping:
             player_velocity_y = jump_strength
             is_jumping = True
+
+        # Throw hammer with cooldown
+        if keys[pygame.K_w] and current_time - last_hammer_time > hammer_cooldown:
+            if facing_direction == "left":
+                hammers.append({"x": player_x, "y": player_y, "vx": -hammer_velocity_x, "vy": hammer_velocity_y_initial})
+            elif facing_direction == "right":
+                hammers.append({"x": player_x + player_width, "y": player_y, "vx": hammer_velocity_x, "vy": hammer_velocity_y_initial})
+            last_hammer_time = current_time
 
         # Apply gravity
         player_velocity_y += gravity
@@ -301,6 +309,22 @@ while running:
             # Move to level two
             level = 2
             continue
+
+        # Collision with enemy
+        if not invincible and (player_x < enemy_x + enemy_width and
+            player_x + player_width > enemy_x and
+            player_y < enemy_y + enemy_height and
+            player_y + player_height > enemy_y):
+            player_lives -= 1
+            if player_lives > 0:
+                # Respawn player at the opposite side of the enemy
+                if enemy_x < SCREEN_WIDTH / 2:
+                    player_x = SCREEN_WIDTH - player_width - 10  # Respawn on the right side
+                else:
+                    player_x = 10  # Respawn on the left side
+                player_y = SCREEN_HEIGHT - player_height - 100
+            else:
+                running = False  # End the game when no lives are left
 
         # Fill screen with white background
         screen.fill(WHITE)
