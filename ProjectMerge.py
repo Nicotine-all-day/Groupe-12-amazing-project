@@ -29,7 +29,7 @@ GAME_STATE_LEVEL1 = 1
 GAME_STATE_LEVEL2 = 2
 current_game_state = GAME_STATE_LEVEL1
 
-# Level 1 settings (from Project-Copy.py)
+# Level 1 settings 
 def init_level1():
     global player_width, player_height, player_x, player_y, player_velocity_x, player_velocity_y
     global player_color, player_lives, gravity, jump_strength, is_jumping
@@ -43,7 +43,7 @@ def init_level1():
     global button_color, button_text_color, last_dash_time, dash_cooldown
     global dash_distance, invincible, facing_direction, level
 
-    # Copy all the original settings from Project-Copy.py here
+    # Copy all the original settings from Project.py here
     player_width = 30
     player_height = 30
     player_x = 100
@@ -97,7 +97,7 @@ def init_level1():
     facing_direction = "right"
     level = 1
 
-# Level 2 settings (from dodger.py)
+# Level 2 settings (from dodger.py) FINALLY we integraded it to our main.py
 def init_level2():
     global TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE
     global BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE
