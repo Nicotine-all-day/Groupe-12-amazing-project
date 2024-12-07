@@ -123,7 +123,6 @@ def init_level2():
     invincible = False
     facing_direction = "right"
     level = 2
-    
 
 # Import all functions from both games
 def draw_button():
