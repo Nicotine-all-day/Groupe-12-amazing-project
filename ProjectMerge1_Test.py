@@ -29,8 +29,35 @@ GAME_STATE_LEVEL1 = 1
 GAME_STATE_LEVEL2 = 2
 current_game_state = GAME_STATE_LEVEL2
 
-# Level 1 settings (from Project-Copy.py)
+# Level 1 settings from the dodger code
 def init_level1():
+    global TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE
+    global BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE
+    global playerRect, baddies, score, moveLeft, moveRight, moveUp, moveDown
+    global reverseCheat, slowCheat, baddieAddCounter, topScore
+    
+    # Initialize all dodger.py settings
+    TEXTCOLOR = (0, 0, 0)
+    BACKGROUNDCOLOR = (255, 255, 255)
+    FPS = 60
+    BADDIEMINSIZE = 10
+    BADDIEMAXSIZE = 40
+    BADDIEMINSPEED = 1
+    BADDIEMAXSPEED = 8
+    ADDNEWBADDIERATE = 6
+    PLAYERMOVERATE = 5
+    
+    # Set up player and game state
+    playerRect = pygame.Rect(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 20, 20)
+    baddies = []
+    score = 0
+    moveLeft = moveRight = moveUp = moveDown = False
+    reverseCheat = slowCheat = False
+    baddieAddCounter = 0
+    topScore = 0
+
+# Level 2 settings from our initial game code - Nico's innovative creation
+def init_level2():
     global player_width, player_height, player_x, player_y, player_velocity_x, player_velocity_y
     global player_color, player_lives, gravity, jump_strength, is_jumping
     global platform_width, platform_height, platform_x, platform_y
@@ -95,34 +122,8 @@ def init_level1():
     dash_distance = 100
     invincible = False
     facing_direction = "right"
-    level = 1
-
-# Level 2 settings (from dodger.py)
-def init_level2():
-    global TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE
-    global BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE
-    global playerRect, baddies, score, moveLeft, moveRight, moveUp, moveDown
-    global reverseCheat, slowCheat, baddieAddCounter, topScore
+    level = 2
     
-    # Initialize all dodger.py settings
-    TEXTCOLOR = (0, 0, 0)
-    BACKGROUNDCOLOR = (255, 255, 255)
-    FPS = 60
-    BADDIEMINSIZE = 10
-    BADDIEMAXSIZE = 40
-    BADDIEMINSPEED = 1
-    BADDIEMAXSPEED = 8
-    ADDNEWBADDIERATE = 6
-    PLAYERMOVERATE = 5
-    
-    # Set up player and game state
-    playerRect = pygame.Rect(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 20, 20)
-    baddies = []
-    score = 0
-    moveLeft = moveRight = moveUp = moveDown = False
-    reverseCheat = slowCheat = False
-    baddieAddCounter = 0
-    topScore = 0
 
 # Import all functions from both games
 def draw_button():
@@ -166,10 +167,6 @@ def victory_screen():
     text = font.render("Congratulations!", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
-    # font = pygame.font.Font(None, 36)
-    # text = font.render("Press SPACE to Start Level Two", True, BLACK)
-    # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
-
     pygame.display.flip()
 
     waiting = True
@@ -192,10 +189,6 @@ def game_over_screen():
     font = pygame.font.Font(None, 36)
     text = font.render("Press SPACE to Restart Level Two", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
-
-    # font = pygame.font.Font(None, 36)
-    # text = font.render("Press S to Skip Level", True, BLACK)
-    # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
 
     pygame.display.flip()
 
@@ -232,7 +225,8 @@ def start_screen():
         "Move Right: D",
         "Jump: SPACE",
         "Drop Down (Level 2): S",
-        "Throw Hammer: W"
+        "Throw Hammer: W",
+        "ENJOY THE GAME!"
     ]
     for i, line in enumerate(commands_text):
         text = font.render(line, True, BLACK)
