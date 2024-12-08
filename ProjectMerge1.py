@@ -163,7 +163,7 @@ def waitForPlayerToPressKey():
 def victory_screen():
     screen.fill(WHITE)
     font = pygame.font.Font(None, 74)
-    text = font.render("Congratulations!", True, BLACK)
+    text = font.render("Congratulations! YOU HAVE WON!!!!", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
     # font = pygame.font.Font(None, 36)
