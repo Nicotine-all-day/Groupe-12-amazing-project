@@ -29,8 +29,44 @@ GAME_STATE_LEVEL1 = 1
 GAME_STATE_LEVEL2 = 2
 current_game_state = GAME_STATE_LEVEL2
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:ProjectMerge1.py
 # Level 1 settings (from Project-Copy.py)
+========
+# Level 1 settings from the dodger code
+>>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9:ProjectMerge1_Test.py
 def init_level1():
+    global TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE
+    global BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE
+    global playerRect, baddies, score, moveLeft, moveRight, moveUp, moveDown
+    global reverseCheat, slowCheat, baddieAddCounter, topScore
+    
+    # Initialize all dodger.py settings
+    TEXTCOLOR = (0, 0, 0)
+    BACKGROUNDCOLOR = (255, 255, 255)
+    FPS = 60
+    BADDIEMINSIZE = 10
+    BADDIEMAXSIZE = 40
+    BADDIEMINSPEED = 1
+    BADDIEMAXSPEED = 8
+    ADDNEWBADDIERATE = 6
+    PLAYERMOVERATE = 5
+    
+    # Set up player and game state
+    playerRect = pygame.Rect(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 20, 20)
+    baddies = []
+    score = 0
+    moveLeft = moveRight = moveUp = moveDown = False
+    reverseCheat = slowCheat = False
+    baddieAddCounter = 0
+    topScore = 0
+
+# Level 2 settings from our initial game code - Nico's innovative creation
+def init_level2():
+=======
+# Level 1 settings
+def init_level1():
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     global player_width, player_height, player_x, player_y, player_velocity_x, player_velocity_y
     global player_color, player_lives, gravity, jump_strength, is_jumping
     global platform_width, platform_height, platform_x, platform_y
@@ -43,7 +79,11 @@ def init_level1():
     global button_color, button_text_color, last_dash_time, dash_cooldown
     global dash_distance, invincible, facing_direction, level
 
+<<<<<<< HEAD
     # Copy all the original settings from Project-Copy.py here
+=======
+    # Copy all the original settings from our first code
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     player_width = 30
     player_height = 30
     player_x = 100
@@ -95,6 +135,10 @@ def init_level1():
     dash_distance = 100
     invincible = False
     facing_direction = "right"
+<<<<<<< HEAD
+<<<<<<<< HEAD:ProjectMerge1.py
+=======
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     level = 1
 
 # Level 2 settings (from dodger.py)
@@ -123,6 +167,12 @@ def init_level2():
     reverseCheat = slowCheat = False
     baddieAddCounter = 0
     topScore = 0
+<<<<<<< HEAD
+========
+    level = 2
+>>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9:ProjectMerge1_Test.py
+=======
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
 
 # Import all functions from both games
 def draw_button():
@@ -163,13 +213,25 @@ def waitForPlayerToPressKey():
 def victory_screen():
     screen.fill(WHITE)
     font = pygame.font.Font(None, 74)
+<<<<<<< HEAD
     text = font.render("Congratulations!", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
+<<<<<<<< HEAD:ProjectMerge1.py
+=======
+    text = font.render("Congratulations! YOU HAVE WON!!!!", True, BLACK)
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
+
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     # font = pygame.font.Font(None, 36)
     # text = font.render("Press SPACE to Start Level Two", True, BLACK)
     # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
 
+<<<<<<< HEAD
+========
+>>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9:ProjectMerge1_Test.py
+=======
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     pygame.display.flip()
 
     waiting = True
@@ -193,10 +255,19 @@ def game_over_screen():
     text = font.render("Press SPACE to Restart Level Two", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:ProjectMerge1.py
+=======
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     # font = pygame.font.Font(None, 36)
     # text = font.render("Press S to Skip Level", True, BLACK)
     # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
 
+<<<<<<< HEAD
+========
+>>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9:ProjectMerge1_Test.py
+=======
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     pygame.display.flip()
 
     waiting = True
@@ -232,7 +303,12 @@ def start_screen():
         "Move Right: D",
         "Jump: SPACE",
         "Drop Down (Level 2): S",
+<<<<<<< HEAD
+        "Throw Hammer: W",
+        "ENJOY THE GAME!"
+=======
         "Throw Hammer: W"
+>>>>>>> dc2866410a9c2783ac6dc6fc428be2c5533de2c9
     ]
     for i, line in enumerate(commands_text):
         text = font.render(line, True, BLACK)
