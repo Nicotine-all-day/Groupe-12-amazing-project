@@ -27,9 +27,9 @@ clock = pygame.time.Clock()
 # Game state
 GAME_STATE_LEVEL1 = 1
 GAME_STATE_LEVEL2 = 2
-current_game_state = GAME_STATE_LEVEL1
+current_game_state = GAME_STATE_LEVEL2
 
-# Level 1 settings 
+# Level 1 settings (from Project-Copy.py)
 def init_level1():
     global player_width, player_height, player_x, player_y, player_velocity_x, player_velocity_y
     global player_color, player_lives, gravity, jump_strength, is_jumping
@@ -43,7 +43,7 @@ def init_level1():
     global button_color, button_text_color, last_dash_time, dash_cooldown
     global dash_distance, invincible, facing_direction, level
 
-    # Copy all the original settings from Project.py here
+    # Copy all the original settings from Project-Copy.py here
     player_width = 30
     player_height = 30
     player_x = 100
@@ -97,7 +97,7 @@ def init_level1():
     facing_direction = "right"
     level = 1
 
-# Level 2 settings (from dodger.py) FINALLY we integraded it to our main.py
+# Level 2 settings (from dodger.py)
 def init_level2():
     global TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE
     global BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE
@@ -166,9 +166,9 @@ def victory_screen():
     text = font.render("Congratulations!", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
-    font = pygame.font.Font(None, 36)
-    text = font.render("Press SPACE to Start Level Two", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
+    # font = pygame.font.Font(None, 36)
+    # text = font.render("Press SPACE to Start Level Two", True, BLACK)
+    # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
 
     pygame.display.flip()
 
@@ -193,9 +193,9 @@ def game_over_screen():
     text = font.render("Press SPACE to Restart Level Two", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 20))
 
-    font = pygame.font.Font(None, 36)
-    text = font.render("Press S to Skip Level Two", True, BLACK)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
+    # font = pygame.font.Font(None, 36)
+    # text = font.render("Press S to Skip Level", True, BLACK)
+    # screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
 
     pygame.display.flip()
 
@@ -218,7 +218,7 @@ def is_button_clicked(mouse_pos):
 def start_screen():
     screen.fill(WHITE)
     font = pygame.font.Font(None, 74)
-    text = font.render("Level One", True, BLACK)
+    text = font.render("Level Two", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
     
     font = pygame.font.Font(None, 36)
@@ -252,7 +252,7 @@ def start_screen():
 def level2_start_screen():
     screen.fill(WHITE)
     font = pygame.font.Font(None, 74)
-    text = font.render("Level Two: Dodger", True, BLACK)
+    text = font.render("Level One: Dodger", True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
     
     font = pygame.font.Font(None, 36)
@@ -426,7 +426,7 @@ def run_level1():
         screen.blit(lives_text, (10, 10))
 
         # Draw the button
-        draw_button()
+        # draw_button()
         
         pygame.display.flip()
         clock.tick(60)
@@ -475,6 +475,7 @@ def run_level2():
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
+                    
                     
                 if event.type == KEYDOWN:
                     if event.key == K_z:
@@ -583,9 +584,26 @@ def run_level2():
         gameOverSound.play()
 
         drawText('GAME OVER', font, windowSurface, (SCREEN_WIDTH / 3), (SCREEN_HEIGHT / 3))
-        drawText('Press a key to play again.', font, windowSurface, (SCREEN_WIDTH / 3) - 80, (SCREEN_HEIGHT / 3) + 50)
+        drawText('Press SPACE to Restart Level', font, windowSurface, (SCREEN_WIDTH / 3) - 80, (SCREEN_HEIGHT / 3) + 50)
+        drawText('Press S to Skip Level', font, windowSurface, (SCREEN_WIDTH / 3) - 80, (SCREEN_HEIGHT / 3) + 90)
         pygame.display.update()
-        waitForPlayerToPressKey()
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    init_level2()
+                    run_level2()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                    init_level1()
+                    start_screen()
+                    run_level1()
+        
+        # Draw the button
+        draw_button()
+
 
         gameOverSound.stop()
 
