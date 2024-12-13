@@ -183,6 +183,8 @@ def draw_button():
 
 def show_victory_screen():
     # Load background image
+    winMusic = pygame.mixer.Sound('Winning level transition music.mp3')
+    winMusic.play()
     background_img = pygame.image.load(os.path.join(current_dir, 'Background Mario Game.jpeg'))
     background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(background_img, (0, 0))
@@ -194,8 +196,11 @@ def show_victory_screen():
     screen.blit(subtext, (SCREEN_WIDTH // 2 - subtext.get_width() // 2, SCREEN_HEIGHT // 2))
     pygame.display.flip()
     pygame.time.wait(5000) 
+    winMusic.stop()
 
 def show_game_over_screen():
+    gameOverSound = pygame.mixer.Sound('gameover.wav')
+    gameOverSound.play()
     background_img = pygame.image.load(os.path.join(current_dir, 'Background Mario Game.jpeg'))
     background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(background_img, (0, 0))
@@ -206,6 +211,8 @@ def show_game_over_screen():
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 4))
     screen.blit(retry_text, (SCREEN_WIDTH // 2 - retry_text.get_width() // 2, SCREEN_HEIGHT // 2))
     pygame.display.flip()
+    pygame.time.wait(5000)
+    gameOverSound.stop()
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -213,6 +220,7 @@ def show_game_over_screen():
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                pygame.mixer.music.play()
                 waiting = False
 
 def is_button_clicked(mouse_pos):
@@ -456,6 +464,7 @@ def run_level2():
 
         # Check for victory condition
         if enemy_lives <= 0:
+            pygame.mixer.music.stop()
             show_victory_screen()
             running = False
 
@@ -473,6 +482,7 @@ def run_level2():
                     player_x = 10
                 player_y = SCREEN_HEIGHT - player_height - 100
             else:
+                pygame.mixer.music.stop()
                 show_game_over_screen()
                 player_lives = 3
                 enemy_lives = 30
@@ -520,7 +530,7 @@ def run_level2():
 
         # Font settings to display lives
         font = pygame.font.Font(None, 36)
-        lives_text = font.render(f"Lives: {player_lives}", True, BLACK)
+        lives_text = font.render(f"Lives: {player_lives}", True, WHITE)
         screen.blit(lives_text, (10, 10))
 
         # Update the display
@@ -605,8 +615,8 @@ def run_level1():
 
     # Show the "Start" screen.
     screen.blit(backgroundImage, (0, 0))
-    drawText('Dodger', font, screen, (SCREEN_WIDTH / 3), (SCREEN_HEIGHT / 3))
-    drawText('Press a key to start.', font, screen, (SCREEN_WIDTH / 3) - 30, (SCREEN_HEIGHT / 3) + 50)
+    drawText('Dodger', font, screen, (SCREEN_WIDTH / 2)-50, (SCREEN_HEIGHT / 2)-50)
+    drawText('Press a key to start.', font, screen, (SCREEN_WIDTH / 3) - 25, (SCREEN_HEIGHT / 3) + 100)
     pygame.display.update()
     waitForPlayerToPressKey()
 
@@ -723,7 +733,7 @@ def run_level1():
             if luigiLife <= 0:
                 pygame.mixer.music.stop()
                 winMusic.play()
-                drawText('You Win!', font, screen, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 3)
+                drawText('You Win!', font, screen, (SCREEN_WIDTH / 2) - 20, (SCREEN_HEIGHT / 2)-20)
                 pygame.display.update()
                 pygame.time.wait(5000)  # Allow the win music to play completely
                 winMusic.stop()
@@ -734,15 +744,14 @@ def run_level1():
 
             # End game if Turtle's life reaches 0.
             if turtleLife <= 0:
-                drawText('GAME OVER', font, screen, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 3)
+                drawText('GAME OVER', font, screen, (SCREEN_WIDTH / 2)-70, (SCREEN_HEIGHT / 3)+7)
                 pygame.display.update()
                 pygame.time.wait(2000)
                 pygame.mixer.music.stop()
                 gameOverSound.play()
 
-                drawText('GAME OVER', font, screen, (SCREEN_WIDTH / 3), (SCREEN_HEIGHT / 3))
                 drawText('Press SPACE to Restart Level', font, screen, (SCREEN_WIDTH / 3) - 80, (SCREEN_HEIGHT / 3) + 50)
-                drawText('Press S to Skip Level', font, screen, (SCREEN_WIDTH / 3) - 80, (SCREEN_HEIGHT / 3) + 90)
+                drawText('Press S to Skip Level', font, screen, (SCREEN_WIDTH / 3) - 30, (SCREEN_HEIGHT / 3) + 90)
                 pygame.display.update()
                 waiting = True
                 while waiting:
